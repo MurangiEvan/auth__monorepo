@@ -6,9 +6,10 @@ const pool = require('./db');
 const requireAuth = require('./middleware/auth');
 require('dotenv').config();
 
-const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || 'https://client-cv7nxfbv8-murangievans-projects.vercel.app' }));
-app.use(express.json());
+const allowedOrigins = (process.env.CLIENT_URL || 'https://client-oho7ho3ma-murangievans-projects.vercel.app')
+  .split(',')
+  .map((o) => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
 
 // Health check — useful for confirming Render deploy is alive
 app.get('/', (req, res) => {
