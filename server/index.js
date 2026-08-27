@@ -6,10 +6,36 @@ const pool = require('./db');
 const requireAuth = require('./middleware/auth');
 require('dotenv').config();
 
-const allowedOrigins = (process.env.CLIENT_URL || 'https://client-oho7ho3ma-murangievans-projects.vercel.app')
-  .split(',')
-  .map((o) => o.trim().replace(/\/+$/, ''))
-  .filter(Boolean);
+const app = express();
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Set allowed origins (defaults to all three domains if CLIENT_URL is not set)
+const defaultOrigins = [
+  'https://client-oho7ho3ma-murangievans-projects.vercel.app',
+  'https://client-cv7nxfbv8-murangievans-projects.vercel.app',
+  'https://auth-monorepo-p05t.onrender.com'
+];
+
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((o) => o.trim().replace(/\/+$/, ''))
+  : defaultOrigins;
+
+// Apply CORS middleware
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Alternatively, raise callback(new Error('Not allowed by CORS')) to block strictly
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Health check — useful for confirming Render deploy is alive
 app.get('/', (req, res) => {
