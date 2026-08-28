@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@/lib/api';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -14,7 +15,7 @@ export default function Dashboard() {
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
+    fetch(`${API_URL}/api/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {
